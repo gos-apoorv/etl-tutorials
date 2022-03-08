@@ -6,7 +6,16 @@
 ### Assumptions
 - Incremental updates are done to table
 
-### Method 1
+### Methods
+
+        Different methods can be used depending on the use-case of delay in data is accepted by business.
+    Depending on it and the volume, we may opt for any of the below methods
+    
+#### Method 1: Cron Schedule to Extract Data Incrementally
+#### Method 2: DB Triggers to Extract Data
+#### Method 3: AWS Lambda
+
+
 
 
 
