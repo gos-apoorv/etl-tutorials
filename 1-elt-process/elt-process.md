@@ -10,7 +10,18 @@
 Different methods can be used depending on the use-case of delay in data is accepted by business.
 Depending on it and the volume, we may opt for any of the below methods
     
-#### Method 1: Naive - Cron Schedule to Extract Data Incrementally
+#### Method 1: Trivial - Cron Schedule to Extract Data Incrementally
+- Trivial Approach
+[![Trivial Approach](https://mermaid.ink/img/pako:eNpNzr0OgjAQAOBXITdpQjWKE4MJERfjogwOlOGghzRCa0qJIYR3txgx3nJ_3yU3QKEFQQhlrV9FhcZ65ytXngspNukiRos5trTMGNtLsU0PRit20nk2o7_RhwQp50mw_u3nnq3YpSPTu-zUbhiiW-JFtiKF4wg-NGQalMK9MkynHNyqIQ6hKwWaBweuJtc9BVo6Cmm1gbDEuiUfsLM66VUBoTUdzSiWeDfYfNX4BqRpTRE)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNpNzr0OgjAQAOBXITdpQjWKE4MJERfjogwOlOGghzRCa0qJIYR3txgx3nJ_3yU3QKEFQQhlrV9FhcZ65ytXngspNukiRos5trTMGNtLsU0PRit20nk2o7_RhwQp50mw_u3nnq3YpSPTu-zUbhiiW-JFtiKF4wg-NGQalMK9MkynHNyqIQ6hKwWaBweuJtc9BVo6Cmm1gbDEuiUfsLM66VUBoTUdzSiWeDfYfNX4BqRpTRE)
+- <u>Drawbacks</u>:
+  This conventional approach has some drawbacks
+
+  1. Export Issues:
+     1. Performance issue to read bulk data.
+     2. Difficult to split output into multiple files.
+  2. Query Issues: 
+     1. As input is not efficiently partitioned, Query will scan large amount of data.
+     2. This inefficient storage not only costs more but also slows the query processing.
 #### Method 2: AWS Glue To Extract Data 
 - Use AWS Glue to connect to PostgreSQL
 - Scheduling Glue Job will help to export data into S3 in partitioned format
