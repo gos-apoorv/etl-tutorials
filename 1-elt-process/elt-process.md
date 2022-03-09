@@ -7,13 +7,16 @@
 - Incremental updates are done to table
 
 ### Methods
-
-        Different methods can be used depending on the use-case of delay in data is accepted by business.
-    Depending on it and the volume, we may opt for any of the below methods
+Different methods can be used depending on the use-case of delay in data is accepted by business.
+Depending on it and the volume, we may opt for any of the below methods
     
-#### Method 1: Cron Schedule to Extract Data Incrementally
-#### Method 2: DB Triggers to Extract Data
-#### Method 3: AWS Lambda
+#### Method 1: Naive - Cron Schedule to Extract Data Incrementally
+#### Method 2: AWS Glue To Extract Data 
+- Use AWS Glue to connect to PostgreSQL
+- Scheduling Glue Job will help to export data into S3 in partitioned format
+- It will also help to add data into data catalog
+#### Method 3: DB Triggers to Extract Data
+#### Method 4: AWS Lambda
 
 
 
