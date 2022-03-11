@@ -3,9 +3,6 @@
 ### Entity Relationship Diagram
 [![Entity Relationship Diagram](https://mermaid.ink/img/pako:eNqNVG1vmzAQ_iuWv3STGqn7GlWV2EK1qYxMLVG_IKELPhIvYCNzJOuS_vfZQAIl6TYkBHpezse9sOepFsinHM1MwspAEStmL6HTukBFSUVAdZWgqgt20JPJYc9mHVexKYv57a3j0ABJre7uYv5-gH1LuYvwF7HUIBCKESqVJHkBt7eB1OLJFpXQ5j16hG_RyEyewV5N2itLo7c4zkoXZY7ngXaS1kmGKJaQbi5xaMwxq9f20VfqcGhKN3_88tV_ih696Ns8nETe58C3RTSYWS-qFKuRb1CxpVxV9lMgZ1KwHw89UdcW0CZdY0VtF5KuFu7VcvcPtk3hPGLhIgiO_TmlrpB22myc8G-yTOaYNEf9U1UCrVlPbMHmBqafCHop0QYJUK2s8NPNzTDMxcEbgdbsh4vvQ9vgi1341jYCWedjM__eWwQRu8rqPL8ahllqnSOotp8bpXeqGzZ2NlUOdUXriZ-VVqxAAgEEQ4MsbGugKFldCjfYCZDL5dke0pDst1Z4yiqcP3_4-KayJ3-3MP_pb4aQX3O7nAVIYZe8GaeY0xoLjLnbXgFm02itrs3OF5K04dMM8gqvOdg9eXpRKZ-SqfEo6v4Vner1DwNOYGI)](https://mermaid-js.github.io/mermaid-live-editor/edit/#pako:eNqNVG1vmzAQ_iuWv3STGqn7GlWV2EK1qYxMLVG_IKELPhIvYCNzJOuS_vfZQAIl6TYkBHpezse9sOepFsinHM1MwspAEStmL6HTukBFSUVAdZWgqgt20JPJYc9mHVexKYv57a3j0ABJre7uYv5-gH1LuYvwF7HUIBCKESqVJHkBt7eB1OLJFpXQ5j16hG_RyEyewV5N2itLo7c4zkoXZY7ngXaS1kmGKJaQbi5xaMwxq9f20VfqcGhKN3_88tV_ih696Ns8nETe58C3RTSYWS-qFKuRb1CxpVxV9lMgZ1KwHw89UdcW0CZdY0VtF5KuFu7VcvcPtk3hPGLhIgiO_TmlrpB22myc8G-yTOaYNEf9U1UCrVlPbMHmBqafCHop0QYJUK2s8NPNzTDMxcEbgdbsh4vvQ9vgi1341jYCWedjM__eWwQRu8rqPL8ahllqnSOotp8bpXeqGzZ2NlUOdUXriZ-VVqxAAgEEQ4MsbGugKFldCjfYCZDL5dke0pDst1Z4yiqcP3_4-KayJ3-3MP_pb4aQX3O7nAVIYZe8GaeY0xoLjLnbXgFm02itrs3OF5K04dMM8gqvOdg9eXpRKZ-SqfEo6v4Vner1DwNOYGI)
 
-### Assumptions
-- Incremental updates are done to table
-
 ### Methods
 Different methods can be used depending on the use-case of delay in data is accepted by business.
 Depending on it and the volume, we may opt for any of the below methods
@@ -23,10 +20,22 @@ Depending on it and the volume, we may opt for any of the below methods
      1. As input is not efficiently partitioned, Query will scan large amount of data.
      2. This inefficient storage not only costs more but also slows the query processing.
 #### Method 2: AWS Glue To Extract Data 
-- Use AWS Glue to connect to PostgreSQL
-- Scheduling Glue Job will help to export data into S3 in partitioned format
-- It will also help to add data into data catalog
-#### Method 3: DB Triggers to Extract Data
+- Connect to RDBMS using JDBC connector and Glue Crawler in AWS Glue to identify the schema and add it to data catalog.
+- If the schema on application side is rapidly evolving , Glue Crawler can be scheduled in regular to identify the changes and transfer it into data catalog.
+  - <b>Incremental Extract Using Incremental Primary Key</b> :
+    - Job Bookmark can be used to get incremental data from the Query
+  - <b>Incremental Extract Using Updated_At Columns</b> :
+    - In this case, Job bookmark doesnt work. We need to override query to get the data incrementally
+  - <b>SQL Query Result</b>:
+    - In this case, we will use SQL transform to create a custom query to get the required result for further processing
+- Use Join transformation to join the data from different tables using key `orchestration_extraction_id` and accordingly get the required results.
+- Further transformation can be applied to get the clean data
+- Data target would be S3 which will be the source for Athena 
+  - Target data will be partitioned to make it performant can be either dates and/or some additional fields
+  - Also target data will be compressed so that data stored is compressed
+- 
+
+#### Method 3: Stream Events to get Real Time Data using Kinesis
 #### Method 4: AWS Lambda
 
 
