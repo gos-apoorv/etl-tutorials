@@ -25,14 +25,14 @@ Incremental batch load would be preferred over real-time replication due to the 
 However, in case of real-time data analysis, later method will be the choice.
 1. <b>Incremental Batch Load</b>:- 
 Either of method can be used to read data incrementally. Final choice would depend on various factor like size of database, number of tables, development-efforts and code re-usability.
-   1. <u>AWS Glue</u>: - Use Join transformation to join the data from different tables from different database using key `orchestration_extraction_id` and accordingly get the required results.
-   2. <u>PySpark/Sqoop Job</u>: In this case, we will use SQL override to create a custom query to get the required result for incremental processing. 
+   1. <ins>AWS Glue</ins>: - Use Join transformation to join the data from different tables from different database using key `orchestration_extraction_id` and accordingly get the required results.
+   2. <ins>PySpark/Sqoop Job</ins>: In this case, we will use SQL override to create a custom query to get the required result for incremental processing. 
 
 Output  from either of these step will be published  into S3 for further processing.
 2. <b>Logical Real-Time Replication</b>:- 
- In case of real-time data,Either of the two method can be used to  export data from Postgres db.
-   1. </u>DMS</u>: Use AWS Data Migration Service to publish events from Postgres To S3 
-   2. </u>Stream Events Using Kinesis</u>: Push WAL logs from postgress to push into Kinesis stream using Lambda. Lambda will convert the data from WAL into readable JSON format. Then data from kinesis can be read using AWS Glue and processed further.
+In case of real-time data,Either of the two method can be used to  export data from Postgres db.
+   1. <ins>DMS</ins>: Use AWS Data Migration Service to publish events from Postgres To S3 
+   2. <ins>Stream Events Using Kinesis</ins>: Push WAL logs from postgress to push into Kinesis stream using Lambda. Lambda will convert the data from WAL into readable JSON format. Then data from kinesis can be read using AWS Glue and processed further.
    
 - Connect to RDBMS using JDBC connector and Glue Crawler in AWS Glue to identify the schema and add it to data catalog automatically.
 - If the schema on application side is rapidly evolving , Glue Crawler can be scheduled in regular to identify the changes and transfer it into data catalog.
