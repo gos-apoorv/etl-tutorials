@@ -12,34 +12,34 @@ Depending on it and the volume, we may opt for any of the below methods
 [![Trivial Approach](https://mermaid.ink/img/pako:eNpNzr0OgjAQAOBXITdpQjWKE4MJERfjogwOlOGghzRCa0qJIYR3txgx3nJ_3yU3QKEFQQhlrV9FhcZ65ytXngspNukiRos5trTMGNtLsU0PRit20nk2o7_RhwQp50mw_u3nnq3YpSPTu-zUbhiiW-JFtiKF4wg-NGQalMK9MkynHNyqIQ6hKwWaBweuJtc9BVo6Cmm1gbDEuiUfsLM66VUBoTUdzSiWeDfYfNX4BqRpTRE)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNpNzr0OgjAQAOBXITdpQjWKE4MJERfjogwOlOGghzRCa0qJIYR3txgx3nJ_3yU3QKEFQQhlrV9FhcZ65ytXngspNukiRos5trTMGNtLsU0PRit20nk2o7_RhwQp50mw_u3nnq3YpSPTu-zUbhiiW-JFtiKF4wg-NGQalMK9MkynHNyqIQ6hKwWaBweuJtc9BVo6Cmm1gbDEuiUfsLM66VUBoTUdzSiWeDfYfNX4BqRpTRE)
 - <u>Drawbacks</u>:
   This conventional approach has some drawbacks
-
   1. Export Issues:
      1. Performance issue to read bulk data.
      2. Difficult to split output into multiple files.
   2. Query Issues: 
      1. As input is not efficiently partitioned, Query will scan large amount of data.
      2. This inefficient storage not only costs more but also slows the query processing.
-#### Method 2: AWS Glue To Extract Data 
-- Connect to RDBMS using JDBC connector and Glue Crawler in AWS Glue to identify the schema and add it to data catalog.
+
+##### Data Extraction:
+[![](https://mermaid.ink/img/pako:eNp9j8GKwjAQQH8lzElBWbC3Hha0LXtRZM2Ch8bDbDPasmki6QRXrP9uisruXnYOYch7PJgLVE4TpLA37lTV6FksN8qKOPmiHOXI-IkdjXdiOn0VxcdyVHyzx4obZ8WKuHZ6HEm_DnwM3PUyKZWSidjg6WV378gkCnlWDi2Rxce4w2_0ZgKV860Uw_IAf_-iJJPZPZwZQtuR_qnP_skPrH8P5M_9nGuyCBNoybfY6HjzZdAURNCSgjSuGv2XAmWv0QtHjUyFbth5SPdoOpoABnbybCtI2Qd6SnmDB4_tw7reAGdbbTQ)](https://mermaid-js.github.io/mermaid-live-editor/edit/#pako:eNp9j8GKwjAQQH8lzElBWbC3Hha0LXtRZM2Ch8bDbDPasmki6QRXrP9uisruXnYOYch7PJgLVE4TpLA37lTV6FksN8qKOPmiHOXI-IkdjXdiOn0VxcdyVHyzx4obZ8WKuHZ6HEm_DnwM3PUyKZWSidjg6WV378gkCnlWDi2Rxce4w2_0ZgKV860Uw_IAf_-iJJPZPZwZQtuR_qnP_skPrH8P5M_9nGuyCBNoybfY6HjzZdAURNCSgjSuGv2XAmWv0QtHjUyFbth5SPdoOpoABnbybCtI2Qd6SnmDB4_tw7reAGdbbTQ)
+Incremental batch load would be preferred over real-time replication due to the job stability and cost. 
+However, in case of real-time data analysis, later method will be the choice.
+1. #####Incremental Batch Load:- 
+Either of method can be used to read data incrementally. Final choice would depend on various factor like size of database, number of tables, development-efforts and code re-usability.
+   1. AWS Glue: - Use Join transformation to join the data from different tables from different database using key `orchestration_extraction_id` and accordingly get the required results.
+   2. PySpark/Sqoop Job: In this case, we will use SQL override to create a custom query to get the required result for incremental processing. 
+
+Output  from either of these step will be published  into S3 for further processing.
+2. #####Logical Real-Time Replication:- 
+ In case of real-time data,Either of the two method can be used to  export data from Postgres db.
+   1. DMS: Use AWS Data Migration Service to publish events from Postgres To S3 
+   2. Stream Events Using Kinesis: Push WAL logs from postgress to push into Kinesis stream using Lambda. Lambda will convert the data from WAL into readable JSON format. Then data from kinesis can be read using AWS Glue and processed further.
+   
+- Connect to RDBMS using JDBC connector and Glue Crawler in AWS Glue to identify the schema and add it to data catalog automatically.
 - If the schema on application side is rapidly evolving , Glue Crawler can be scheduled in regular to identify the changes and transfer it into data catalog.
-  - <b>Incremental Extract Using Incremental Primary Key</b> :
-    - Job Bookmark can be used to get incremental data from the Query
-  - <b>Incremental Extract Using Updated_At Columns</b> :
-    - In this case, Job bookmark doesnt work. We need to override query to get the data incrementally
-  - <b>SQL Query Result</b>:
-    - In this case, we will use SQL transform to create a custom query to get the required result for further processing
-- Use Join transformation to join the data from different tables using key `orchestration_extraction_id` and accordingly get the required results.
+
 - Further transformation can be applied to get the clean data
 - Data target would be S3 which will be the source for Athena 
   - Target data will be partitioned to make it performant can be either dates and/or some additional fields
   - Also target data will be compressed so that data stored is compressed
-- 
-
-#### Method 3: Stream Events to get Real Time Data using Kinesis
-#### Method 4: AWS Lambda
-
-
-
-
 
 
